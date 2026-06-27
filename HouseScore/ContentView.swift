@@ -10,7 +10,7 @@ import SwiftData
 
 struct ContentView: View {
     @State private var viewModel: ListingsViewModel
-    @State private var isAdding = false
+    @State private var propertyTypeToBeAdded: PropertyType?
 
     init(modelContext: ModelContext) {
         _viewModel = State(wrappedValue: ListingsViewModel(modelContext: modelContext))
@@ -40,17 +40,23 @@ struct ContentView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
+                if !viewModel.listings.isEmpty {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        EditButton()
+                    }
                 }
                 ToolbarItem(placement: .primaryAction) {
-                    Button { isAdding = true } label: {
+                    Menu {
+                        ForEach(PropertyType.allCases) { type in
+                            Button(type.displayName) { propertyTypeToBeAdded = type }
+                        }
+                    } label: {
                         Image(systemName: "plus")
                     }
                 }
             }
-            .sheet(isPresented: $isAdding) {
-                ListingFormView(type: .add, viewModel: viewModel)
+            .sheet(item: $propertyTypeToBeAdded) { type in
+                ListingFormView(type: .add(type), viewModel: viewModel)
             }
         }
     }

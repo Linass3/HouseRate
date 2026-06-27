@@ -26,24 +26,41 @@ final class ListingsViewModel {
         listings = (try? modelContext.fetch(descriptor)) ?? []
     }
 
-    func add(address: String, price: Double?, rating: Int, notes: String, visitedAt: Date) {
+    func add(
+        address: String,
+        price: Double?,
+        rating: Int,
+        notes: String,
+        visitedAt: Date,
+        propertyType: PropertyType
+    ) {
         let listing = HouseListing(
             address: address,
             price: price,
             rating: rating,
             notes: notes,
-            visitedAt: visitedAt
+            visitedAt: visitedAt,
+            propertyType: propertyType
         )
         modelContext.insert(listing)
         fetch()
     }
 
-    func update(_ listing: HouseListing, address: String, price: Double?, rating: Int, notes: String, visitedAt: Date) {
+    func update(
+        _ listing: HouseListing,
+        address: String,
+        price: Double?,
+        rating: Int,
+        notes: String,
+        visitedAt: Date,
+        propertyType: PropertyType
+    ) {
         listing.address = address
         listing.price = price
         listing.rating = rating
         listing.notes = notes
         listing.visitedAt = visitedAt
+        listing.propertyType = propertyType
         fetch()
     }
 
@@ -52,8 +69,8 @@ final class ListingsViewModel {
         fetch()
     }
 
-    func delete(at offsets: IndexSet) {
-        for index in offsets {
+    func delete(at indexSet: IndexSet) {
+        for index in indexSet {
             modelContext.delete(listings[index])
         }
         fetch()

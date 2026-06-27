@@ -17,6 +17,7 @@ struct ListingDetailView: View {
     var body: some View {
         List {
             Section("Property") {
+                LabeledContent("Type", value: listing.propertyType.displayName)
                 LabeledContent("Address", value: listing.address)
 
                 if let price = listing.price {

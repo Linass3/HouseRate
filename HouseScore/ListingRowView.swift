@@ -16,6 +16,10 @@ struct ListingRowView: View {
             Text(listing.address)
                 .font(.headline)
 
+            Text(listing.propertyType.displayName)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
             HStack {
                 ratingStars
 

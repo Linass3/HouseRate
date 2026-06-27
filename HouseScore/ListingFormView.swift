@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 enum ListingFormType {
-    case add
+    case add(PropertyType)
     case edit(HouseListing)
 }
 
@@ -23,22 +23,26 @@ struct ListingFormView: View {
     @State private var rating: Int
     @State private var notes: String
     @State private var visitedAt: Date
+    @State private var propertyType: PropertyType
 
     init(type: ListingFormType, viewModel: ListingsViewModel) {
         self.type = type
         self.viewModel = viewModel
-        if case .edit(let listing) = type {
-            _address = State(initialValue: listing.address)
-            _priceText = State(initialValue: listing.price.map { String($0) } ?? "")
-            _rating = State(initialValue: listing.rating)
-            _notes = State(initialValue: listing.notes)
-            _visitedAt = State(initialValue: listing.visitedAt)
-        } else {
+        switch type {
+        case .add(let preselectedType):
             _address = State(initialValue: "")
             _priceText = State(initialValue: "")
             _rating = State(initialValue: 5)
             _notes = State(initialValue: "")
             _visitedAt = State(initialValue: .now)
+            _propertyType = State(initialValue: preselectedType)
+        case .edit(let listing):
+            _address = State(initialValue: listing.address)
+            _priceText = State(initialValue: listing.price.map { String($0) } ?? "")
+            _rating = State(initialValue: listing.rating)
+            _notes = State(initialValue: listing.notes)
+            _visitedAt = State(initialValue: listing.visitedAt)
+            _propertyType = State(initialValue: listing.propertyType)
         }
     }
 
@@ -46,6 +50,13 @@ struct ListingFormView: View {
         NavigationStack {
             Form {
                 Section("Property") {
+                    if case .edit = type {
+                        Picker("Type", selection: $propertyType) {
+                            ForEach(PropertyType.allCases, id: \.self) { t in
+                                Text(t.displayName).tag(t)
+                            }
+                        }
+                    }
                     TextField("Address", text: $address)
                     TextField("Asking Price", text: $priceText)
                         .keyboardType(.numberPad)
@@ -74,7 +85,7 @@ struct ListingFormView: View {
 
     private var titleText: String {
         switch type {
-        case .add: "New Listing"
+        case .add(let propertyType): "New \(propertyType.displayName)"
         case .edit: "Edit Listing"
         }
     }
@@ -84,9 +95,9 @@ struct ListingFormView: View {
         let trimmedAddress = address.trimmingCharacters(in: .whitespaces)
         switch type {
         case .add:
-            viewModel.add(address: trimmedAddress, price: price, rating: rating, notes: notes, visitedAt: visitedAt)
+            viewModel.add(address: trimmedAddress, price: price, rating: rating, notes: notes, visitedAt: visitedAt, propertyType: propertyType)
         case .edit(let listing):
-            viewModel.update(listing, address: trimmedAddress, price: price, rating: rating, notes: notes, visitedAt: visitedAt)
+            viewModel.update(listing, address: trimmedAddress, price: price, rating: rating, notes: notes, visitedAt: visitedAt, propertyType: propertyType)
         }
         dismiss()
     }
@@ -99,7 +110,7 @@ struct ListingFormView: View {
 #Preview("Add") {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: HouseListing.self, configurations: config)
-    ListingFormView(type: .add, viewModel: ListingsViewModel(modelContext: container.mainContext))
+    ListingFormView(type: .add(.flat), viewModel: ListingsViewModel(modelContext: container.mainContext))
 }
 
 #Preview("Edit") {
