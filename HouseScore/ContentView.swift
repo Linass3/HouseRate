@@ -40,15 +40,12 @@ struct ContentView: View {
                 }
             }
             .toolbar {
-                if !viewModel.listings.isEmpty {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        EditButton()
-                    }
-                }
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
                         ForEach(PropertyType.allCases) { type in
-                            Button(type.displayName) { propertyTypeToBeAdded = type }
+                            Button(type.displayName) {
+                                propertyTypeToBeAdded = type
+                            }
                         }
                     } label: {
                         Image(systemName: "plus")
