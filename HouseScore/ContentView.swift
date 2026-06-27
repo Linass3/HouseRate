@@ -9,53 +9,55 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @State private var viewModel: ListingsViewModel
+    @State private var isAdding = false
+
+    init(modelContext: ModelContext) {
+        _viewModel = State(wrappedValue: ListingsViewModel(modelContext: modelContext))
+    }
 
     var body: some View {
-        NavigationSplitView {
+        NavigationStack {
             List {
-                ForEach(items) { item in
+                ForEach(viewModel.listings) { listing in
                     NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
+                        ListingDetailView(listing: listing, viewModel: viewModel)
                     } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                        ListingRowView(listing: listing)
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .onDelete { index in
+                    viewModel.delete(at: index)
+                }
+            }
+            .overlay {
+                if viewModel.listings.isEmpty {
+                    ContentUnavailableView(
+                        "No Listings",
+                        systemImage: "house",
+                        description: Text("Tap + to add a reviewed house")
+                    )
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
                 }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                ToolbarItem(placement: .primaryAction) {
+                    Button { isAdding = true } label: {
+                        Image(systemName: "plus")
                     }
                 }
             }
-        } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            .sheet(isPresented: $isAdding) {
+                ListingFormView(type: .add, viewModel: viewModel)
             }
         }
     }
 }
 
 #Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: HouseListing.self, configurations: config)
+    ContentView(modelContext: container.mainContext)
 }
