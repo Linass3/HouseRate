@@ -31,6 +31,18 @@ struct ListingDetailView: View {
                 }
             }
 
+            if listing.contactPhone != nil || listing.listingURL != nil {
+                Section("Contact") {
+                    if let phone = listing.contactPhone {
+                        Link(phone, destination: URL(string: "tel:\(phone.filter { !$0.isWhitespace })")!)
+                    }
+                    if let urlString = listing.listingURL {
+                        let url = URL(string: urlString.hasPrefix("http") ? urlString : "https://\(urlString)")!
+                        Link(urlString, destination: url)
+                    }
+                }
+            }
+
             Section("Your Review") {
                 LabeledContent("Rating") {
                     HStack(spacing: 2) {

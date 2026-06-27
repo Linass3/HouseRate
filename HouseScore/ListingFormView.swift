@@ -24,6 +24,8 @@ struct ListingFormView: View {
     @State private var notes: String
     @State private var visitedAt: Date
     @State private var propertyType: PropertyType
+    @State private var contactPhone: String
+    @State private var listingURL: String
 
     init(type: ListingFormType, viewModel: ListingsViewModel) {
         self.type = type
@@ -36,6 +38,8 @@ struct ListingFormView: View {
             _notes = State(initialValue: "")
             _visitedAt = State(initialValue: .now)
             _propertyType = State(initialValue: preselectedType)
+            _contactPhone = State(initialValue: "")
+            _listingURL = State(initialValue: "")
         case .edit(let listing):
             _address = State(initialValue: listing.address)
             _priceText = State(initialValue: listing.price.map { String($0) } ?? "")
@@ -43,6 +47,8 @@ struct ListingFormView: View {
             _notes = State(initialValue: listing.notes)
             _visitedAt = State(initialValue: listing.visitedAt)
             _propertyType = State(initialValue: listing.propertyType)
+            _contactPhone = State(initialValue: listing.contactPhone ?? "")
+            _listingURL = State(initialValue: listing.listingURL ?? "")
         }
     }
 
@@ -61,6 +67,15 @@ struct ListingFormView: View {
                     TextField("Asking Price", text: $priceText)
                         .keyboardType(.numberPad)
                     DatePicker("Visit Date", selection: $visitedAt, displayedComponents: .date)
+                }
+
+                Section("Contact") {
+                    TextField("Phone Number", text: $contactPhone)
+                        .keyboardType(.phonePad)
+                    TextField("Listing URL", text: $listingURL)
+                        .keyboardType(.URL)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
                 }
 
                 Section("Your Review") {
@@ -93,11 +108,13 @@ struct ListingFormView: View {
     private func save() {
         let price = Double(priceText)
         let trimmedAddress = address.trimmingCharacters(in: .whitespaces)
+        let phone = contactPhone.trimmingCharacters(in: .whitespaces)
+        let url = listingURL.trimmingCharacters(in: .whitespaces)
         switch type {
         case .add:
-            viewModel.add(address: trimmedAddress, price: price, rating: rating, notes: notes, visitedAt: visitedAt, propertyType: propertyType)
+            viewModel.add(address: trimmedAddress, price: price, rating: rating, notes: notes, visitedAt: visitedAt, propertyType: propertyType, contactPhone: phone.isEmpty ? nil : phone, listingURL: url.isEmpty ? nil : url)
         case .edit(let listing):
-            viewModel.update(listing, address: trimmedAddress, price: price, rating: rating, notes: notes, visitedAt: visitedAt, propertyType: propertyType)
+            viewModel.update(listing, address: trimmedAddress, price: price, rating: rating, notes: notes, visitedAt: visitedAt, propertyType: propertyType, contactPhone: phone.isEmpty ? nil : phone, listingURL: url.isEmpty ? nil : url)
         }
         dismiss()
     }

@@ -30,6 +30,8 @@ final class HouseListing {
     var notes: String
     var visitedAt: Date
     var propertyType: PropertyType = PropertyType.flat
+    var contactPhone: String?
+    var listingURL: String?
 
     init(
         address: String,
@@ -37,7 +39,9 @@ final class HouseListing {
         rating: Int = 3,
         notes: String = "",
         visitedAt: Date = .now,
-        propertyType: PropertyType = .flat
+        propertyType: PropertyType = .flat,
+        contactPhone: String? = nil,
+        listingURL: String? = nil
     ) {
         self.address = address
         self.price = price
@@ -45,5 +49,7 @@ final class HouseListing {
         self.notes = notes
         self.visitedAt = visitedAt
         self.propertyType = propertyType
+        self.contactPhone = contactPhone
+        self.listingURL = listingURL
     }
 }

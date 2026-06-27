@@ -32,7 +32,9 @@ final class ListingsViewModel {
         rating: Int,
         notes: String,
         visitedAt: Date,
-        propertyType: PropertyType
+        propertyType: PropertyType,
+        contactPhone: String?,
+        listingURL: String?
     ) {
         let listing = HouseListing(
             address: address,
@@ -40,7 +42,9 @@ final class ListingsViewModel {
             rating: rating,
             notes: notes,
             visitedAt: visitedAt,
-            propertyType: propertyType
+            propertyType: propertyType,
+            contactPhone: contactPhone,
+            listingURL: listingURL
         )
         modelContext.insert(listing)
         fetch()
@@ -53,7 +57,9 @@ final class ListingsViewModel {
         rating: Int,
         notes: String,
         visitedAt: Date,
-        propertyType: PropertyType
+        propertyType: PropertyType,
+        contactPhone: String?,
+        listingURL: String?
     ) {
         listing.address = address
         listing.price = price
@@ -61,6 +67,8 @@ final class ListingsViewModel {
         listing.notes = notes
         listing.visitedAt = visitedAt
         listing.propertyType = propertyType
+        listing.contactPhone = contactPhone
+        listing.listingURL = listingURL
         fetch()
     }
 
