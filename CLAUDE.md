@@ -61,7 +61,7 @@ In the future, the app may support sharing listings with friends online. Keep to
 ## Code Quality
 
 - Make focused changes that match the existing style.
-- Prefer clear names over comments. Add comments only when they explain non-obvious decisions.
+- Do not add comments. Convey intent through precise, descriptive names and focused functions; a longer name or an extra helper is preferred over a comment when it makes the code easier to understand or removes ambiguity. Write a comment only when it records a critical, non-obvious detail the code cannot express on its own — a subtle invariant, a deliberate workaround, or a correctness-affecting gotcha — or when the user explicitly asks for one. Never add comments that restate the code, narrate steps, act as section banners, or repeat tutorial/boilerplate text.
 - Avoid unrelated refactors, file moves, formatting churn, or generated project changes.
 - Keep previews working when changing views.
 - Do not leave placeholder code, dead code, or commented-out experiments.

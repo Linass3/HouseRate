@@ -1,14 +1,7 @@
-//
-//  ContentView.swift
-//  HouseScore
-//
-//  Created by Linas Venclavičius on 12/06/2026.
-//
-
 import SwiftUI
 import SwiftData
 
-struct ContentView: View {
+struct ListingsView: View {
     @State private var viewModel: ListingsViewModel
     @State private var propertyTypeToBeAdded: PropertyType?
 
@@ -62,5 +55,5 @@ struct ContentView: View {
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: HouseListing.self, configurations: config)
-    ContentView(modelContext: container.mainContext)
+    ListingsView(modelContext: container.mainContext)
 }

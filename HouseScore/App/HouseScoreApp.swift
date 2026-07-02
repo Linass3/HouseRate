@@ -1,17 +1,10 @@
-//
-//  HouseScoreApp.swift
-//  HouseScore
-//
-//  Created by Linas Venclavičius on 12/06/2026.
-//
-
 import SwiftUI
 import SwiftData
 
 @main
 struct HouseScoreApp: App {
     let container: ModelContainer = {
-        let schema = Schema([HouseListing.self])
+        let schema = Schema([HouseListing.self, ListingPhoto.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
             return try ModelContainer(for: schema, configurations: config)
@@ -22,7 +15,7 @@ struct HouseScoreApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(modelContext: container.mainContext)
+            ListingsView(modelContext: container.mainContext)
         }
         .modelContainer(container)
     }

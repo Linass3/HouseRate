@@ -1,10 +1,3 @@
-//
-//  ListingsViewModel.swift
-//  HouseScore
-//
-//  Created by Linas Venclavičius on 12/06/2026.
-//
-
 import Foundation
 import Observation
 import SwiftData
@@ -12,18 +5,19 @@ import SwiftData
 @Observable
 final class ListingsViewModel {
     private(set) var listings: [HouseListing] = []
-    private let modelContext: ModelContext
+    private let store: ListingStore
 
-    init(modelContext: ModelContext) {
-        self.modelContext = modelContext
+    init(store: ListingStore) {
+        self.store = store
         fetch()
     }
 
+    convenience init(modelContext: ModelContext) {
+        self.init(store: SwiftDataListingStore(context: modelContext))
+    }
+
     func fetch() {
-        let descriptor = FetchDescriptor<HouseListing>(
-            sortBy: [SortDescriptor(\.visitedAt, order: .reverse)]
-        )
-        listings = (try? modelContext.fetch(descriptor)) ?? []
+        listings = store.fetchAll()
     }
 
     func add(
@@ -34,7 +28,8 @@ final class ListingsViewModel {
         visitedAt: Date,
         propertyType: PropertyType,
         contactPhone: String?,
-        listingURL: String?
+        listingURL: String?,
+        photoData: [Data]
     ) {
         let listing = HouseListing(
             address: address,
@@ -46,7 +41,7 @@ final class ListingsViewModel {
             contactPhone: contactPhone,
             listingURL: listingURL
         )
-        modelContext.insert(listing)
+        store.add(listing, photoData: photoData)
         fetch()
     }
 
@@ -59,7 +54,9 @@ final class ListingsViewModel {
         visitedAt: Date,
         propertyType: PropertyType,
         contactPhone: String?,
-        listingURL: String?
+        listingURL: String?,
+        photosToAdd: [Data],
+        photosToRemove: [ListingPhoto]
     ) {
         listing.address = address
         listing.price = price
@@ -69,17 +66,18 @@ final class ListingsViewModel {
         listing.propertyType = propertyType
         listing.contactPhone = contactPhone
         listing.listingURL = listingURL
+        store.update(listing, photosToAdd: photosToAdd, photosToRemove: photosToRemove)
         fetch()
     }
 
     func delete(_ listing: HouseListing) {
-        modelContext.delete(listing)
+        store.delete(listing)
         fetch()
     }
 
     func delete(at indexSet: IndexSet) {
         for index in indexSet {
-            modelContext.delete(listings[index])
+            store.delete(listings[index])
         }
         fetch()
     }

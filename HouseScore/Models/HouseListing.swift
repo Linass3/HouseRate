@@ -1,26 +1,5 @@
-//
-//  HouseListing.swift
-//  HouseScore
-//
-//  Created by Linas Venclavičius on 12/06/2026.
-//
-
 import Foundation
 import SwiftData
-
-enum PropertyType: String, Codable, CaseIterable, Identifiable {
-    case flat, cottage, house
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .flat:    "Flat"
-        case .cottage: "Cottage"
-        case .house:   "House"
-        }
-    }
-}
 
 @Model
 final class HouseListing {
@@ -32,6 +11,7 @@ final class HouseListing {
     var propertyType: PropertyType = PropertyType.flat
     var contactPhone: String?
     var listingURL: String?
+    @Relationship(deleteRule: .cascade) var photos: [ListingPhoto] = []
 
     init(
         address: String,

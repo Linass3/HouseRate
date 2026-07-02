@@ -1,10 +1,3 @@
-//
-//  ListingDetailView.swift
-//  HouseScore
-//
-//  Created by Linas Venclavičius on 12/06/2026.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -16,6 +9,38 @@ struct ListingDetailView: View {
 
     var body: some View {
         List {
+            if !listing.photos.isEmpty {
+                let sorted = listing.photos.sorted(by: { $0.createdAt < $1.createdAt })
+                Section {
+                    if sorted.count == 1, let img = UIImage(data: sorted[0].imageData) {
+                        Image(uiImage: img)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 200)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    } else {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(sorted) { photo in
+                                    if let img = UIImage(data: photo.imageData) {
+                                        Image(uiImage: img)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 260, height: 180)
+                                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    }
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                }
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color(.systemGroupedBackground))
+                .listSectionSeparator(.hidden)
+            }
+
             Section("Property") {
                 LabeledContent("Type", value: listing.propertyType.displayName)
                 LabeledContent("Address", value: listing.address)
