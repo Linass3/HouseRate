@@ -19,15 +19,17 @@ In the future, the app may support sharing listings with friends online. Keep to
 
 - Keep SwiftUI views focused on rendering and user interaction.
 - Keep state changes, validation, sorting, filtering, and persistence coordination in view models.
-- Use dependency injection for `ModelContext`, `ModelContainer`, clocks/dates, and other collaborators so code remains testable.
+- Persistence is isolated behind the `ListingStore` protocol; `SwiftDataListingStore` is the SwiftData-backed implementation and the single owner of `ModelContext`. View models depend on `ListingStore` (via DI), not on `ModelContext` directly, so SwiftData stays behind one seam and a future sync backend can conform to the same protocol.
+- Use dependency injection for stores/`ModelContext`, `ModelContainer`, clocks/dates, and other collaborators so code remains testable.
 - Keep SwiftData model types small and explicit. Add migrations deliberately when persisted schema changes.
-- Prefer simple architecture until complexity proves it needs another layer. Add repositories/services only when they reduce duplication or isolate real complexity.
+- Prefer simple architecture until complexity proves it needs another layer. The `ListingStore` seam is the current persistence boundary; add further stores/services only when they reduce duplication or isolate real complexity.
 - Avoid putting business logic in previews, views, or app entry points.
 
 ## SwiftData Guidelines
 
 - Use SwiftData as the source of truth for persisted app data.
-- Use in-memory `ModelContainer` configurations for previews and tests.
+- Route SwiftData access through `SwiftDataListingStore` (the single `ModelContext` owner); keep new `ModelContext` calls out of view models and views.
+- Use in-memory `ModelContainer` configurations for previews and tests. When retaining an in-memory container in a test, hold it in a stored property for the test's lifetime — returning `container.mainContext` from a helper lets the container deallocate and SwiftData will trap on first use.
 - Keep `ModelContext` usage on the appropriate actor, usually the main actor for UI-driven flows.
 - Handle persistence failures intentionally. Avoid silently swallowing errors in new code unless the UX has a clear fallback.
 - Do not introduce Core Data, Realm, SQLite wrappers, files-as-database, or network storage without asking first.
@@ -65,12 +67,16 @@ In the future, the app may support sharing listings with friends online. Keep to
 - Do not leave placeholder code, dead code, or commented-out experiments.
 - Ask before changing the app's architecture, persistence strategy, minimum OS target, package dependencies, or product scope.
 
-## Suggested File Organization
+## File Organization
 
-- `Models/`: SwiftData `@Model` types and lightweight domain types.
-- `ViewModels/`: `@Observable` MVVM types and presentation logic.
-- `Views/`: SwiftUI screens, rows, forms, and reusable view components.
-- `Services/`: Only for real cross-cutting behavior such as import/export, scoring rules, or integrations.
-- `Tests/`: Swift Testing unit tests grouped by feature or type.
+Source lives under `HouseScore/`, grouped by responsibility:
 
-The current project is small, so do not reorganize files just to match this structure. Move files only when it makes the code easier to navigate.
+- `App/`: App entry point (`HouseScoreApp.swift`) — wiring only, no business logic.
+- `Models/`: SwiftData `@Model` types and lightweight domain types, one type per file (`HouseListing`, `ListingPhoto`, `PropertyType`).
+- `ViewModels/`: `@Observable` MVVM types and presentation logic (`ListingsViewModel`, `ListingFormViewModel`; the `ListingFormType` mode enum lives with the form view model).
+- `Views/`: SwiftUI screens, rows, and forms (`ListingsView`, `ListingDetailView`, `ListingRowView`, `ListingFormView`).
+- `Persistence/`: The persistence seam — `ListingStore` protocol and `SwiftDataListingStore` implementation.
+- `Services/`: Only for real cross-cutting behavior such as import/export, scoring rules, or integrations. None yet.
+- Tests live in `HouseScoreTests/` (Swift Testing) and `HouseScoreUITests/`.
+
+The Xcode project uses file-system synchronized groups, so adding, moving, or renaming a file under `HouseScore/<Folder>/` is included in the target automatically — do not hand-edit `HouseScore.xcodeproj/project.pbxproj` to register files. Keep types in the folder that matches their role; put a new type where its peers already live.
