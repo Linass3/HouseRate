@@ -15,7 +15,7 @@ struct HouseScoreApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ListingsView(modelContext: container.mainContext)
+            RootView(modelContext: container.mainContext)
         }
         .modelContainer(container)
     }

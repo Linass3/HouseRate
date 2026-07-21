@@ -1,21 +1,29 @@
 import SwiftUI
 import SwiftData
 
+enum ListingsRoute: Hashable {
+    case detail(HouseListing)
+    case form(ListingFormType)
+}
+
 struct ListingsView: View {
-    @State private var viewModel: ListingsViewModel
-    @State private var propertyTypeToBeAdded: PropertyType?
+
+    @State
+    private var viewModel: ListingsViewModel
+
+    init(viewModel: ListingsViewModel) {
+        _viewModel = State(wrappedValue: viewModel)
+    }
 
     init(modelContext: ModelContext) {
-        _viewModel = State(wrappedValue: ListingsViewModel(modelContext: modelContext))
+        self.init(viewModel: ListingsViewModel(modelContext: modelContext))
     }
 
     var body: some View {
         NavigationStack {
             List {
                 ForEach(viewModel.listings) { listing in
-                    NavigationLink {
-                        ListingDetailView(listing: listing, viewModel: viewModel)
-                    } label: {
+                    NavigationLink(value: ListingsRoute.detail(listing)) {
                         ListingRowView(listing: listing)
                     }
                 }
@@ -36,8 +44,8 @@ struct ListingsView: View {
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
                         ForEach(PropertyType.allCases) { type in
-                            Button(type.displayName) {
-                                propertyTypeToBeAdded = type
+                            NavigationLink(value: ListingsRoute.form(.add(type))) {
+                                Text(type.displayName)
                             }
                         }
                     } label: {
@@ -45,8 +53,13 @@ struct ListingsView: View {
                     }
                 }
             }
-            .sheet(item: $propertyTypeToBeAdded) { type in
-                ListingFormView(type: .add(type), viewModel: viewModel)
+            .navigationDestination(for: ListingsRoute.self) { route in
+                switch route {
+                case .detail(let listing):
+                    ListingDetailView(listing: listing, viewModel: viewModel)
+                case .form(let type):
+                    ListingFormView(type: type, viewModel: viewModel)
+                }
             }
         }
     }

@@ -5,8 +5,6 @@ struct ListingDetailView: View {
     let listing: HouseListing
     let viewModel: ListingsViewModel
 
-    @State private var isEditing = false
-
     var body: some View {
         List {
             if !listing.photos.isEmpty {
@@ -88,11 +86,10 @@ struct ListingDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("Edit") { isEditing = true }
+                NavigationLink(value: ListingsRoute.form(.edit(listing))) {
+                    Text("Edit")
+                }
             }
-        }
-        .sheet(isPresented: $isEditing) {
-            ListingFormView(type: .edit(listing), viewModel: viewModel)
         }
     }
 }

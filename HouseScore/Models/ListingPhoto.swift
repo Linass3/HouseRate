@@ -3,7 +3,9 @@ import SwiftData
 
 @Model
 final class ListingPhoto {
-    @Attribute(.externalStorage) var imageData: Data
+
+    @Attribute(.externalStorage)
+    var imageData: Data
     var createdAt: Date
 
     init(imageData: Data) {

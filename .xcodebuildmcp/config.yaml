@@ -1,0 +1,15 @@
+schemaVersion: 1
+enabledWorkflows:
+  - simulator
+  - ui-automation
+  - xcode-ide
+debug: true
+sentryDisabled: true
+setupPreferences:
+  platforms:
+    - iOS
+sessionDefaults:
+  projectPath: HouseScore.xcodeproj
+  scheme: HouseScore
+  simulatorId: E6C8EFAD-F9B6-4E5A-BC4D-02A38A35E1C1
+  simulatorName: iPhone 17 Pro

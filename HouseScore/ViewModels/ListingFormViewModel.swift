@@ -3,7 +3,7 @@ import Observation
 import SwiftUI
 import PhotosUI
 
-enum ListingFormType {
+enum ListingFormType: Hashable {
     case add(PropertyType)
     case edit(HouseListing)
 }
